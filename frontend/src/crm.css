@@ -1,0 +1,270 @@
+/*
+ * CRM Application Shell Styles
+ *
+ * Covers:
+ *   - Two-column shell layout (sidebar + main)
+ *   - Sidebar nav link styles
+ *   - Topbar
+ *   - Responsive mobile drawer
+ *   - Utility overrides for Bootstrap
+ *
+ * No external dependencies — uses Bootstrap CSS variables where possible.
+ */
+
+/* ── CSS variables ─────────────────────────────────────────────────────────── */
+:root {
+  --crm-sidebar-width: 240px;
+  --crm-topbar-height: 56px;
+  --crm-sidebar-bg: #1a1f2e;
+  --crm-sidebar-text: rgba(255, 255, 255, 0.75);
+  --crm-sidebar-text-hover: #ffffff;
+  --crm-sidebar-active-bg: rgba(255, 255, 255, 0.1);
+  --crm-sidebar-active-text: #ffffff;
+  --crm-sidebar-brand-height: 60px;
+  --crm-sidebar-footer-height: 60px;
+  --crm-topbar-bg: #ffffff;
+  --crm-topbar-border: #e5e7eb;
+  --crm-content-bg: #f4f6f9;
+  --crm-transition: 0.22s ease;
+}
+
+/* ── Reset / base ───────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--crm-content-bg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Shell grid ─────────────────────────────────────────────────────────────── */
+.crm-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar wrapper — handles show/hide on mobile */
+.crm-sidebar-wrapper {
+  width: var(--crm-sidebar-width);
+  flex-shrink: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 1040;
+  transform: translateX(-100%);
+  transition: transform var(--crm-transition);
+}
+
+/* Desktop — always visible */
+@media (min-width: 992px) {
+  .crm-sidebar-wrapper {
+    transform: translateX(0) !important;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: auto;
+  }
+}
+
+/* Mobile — slide in when open */
+.crm-sidebar--open {
+  transform: translateX(0);
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────────── */
+.crm-sidebar {
+  width: var(--crm-sidebar-width);
+  height: 100vh;
+  background-color: var(--crm-sidebar-bg);
+  color: var(--crm-sidebar-text);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.crm-sidebar__brand {
+  height: var(--crm-sidebar-brand-height);
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  color: #ffffff;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.crm-sidebar__footer {
+  height: var(--crm-sidebar-footer-height);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+/* ── Nav links ──────────────────────────────────────────────────────────────── */
+.crm-nav-link {
+  color: var(--crm-sidebar-text) !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color var(--crm-transition), color var(--crm-transition);
+  text-decoration: none;
+}
+
+.crm-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--crm-sidebar-text-hover) !important;
+}
+
+.crm-nav-link--active {
+  background-color: var(--crm-sidebar-active-bg) !important;
+  color: var(--crm-sidebar-active-text) !important;
+}
+
+.crm-nav-link i {
+  width: 18px;
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+.crm-nav-link--active i {
+  opacity: 1;
+}
+
+/* ── Main column ─────────────────────────────────────────────────────────────── */
+.crm-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* On desktop, offset by sidebar width */
+  margin-left: 0;
+}
+
+@media (min-width: 992px) {
+  .crm-main {
+    margin-left: var(--crm-sidebar-width);
+  }
+}
+
+/* ── Topbar ─────────────────────────────────────────────────────────────────── */
+.crm-topbar {
+  height: var(--crm-topbar-height);
+  background-color: var(--crm-topbar-bg);
+  border-bottom: 1px solid var(--crm-topbar-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+/* ── Content area ────────────────────────────────────────────────────────────── */
+.crm-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .crm-content {
+    padding: 2rem;
+  }
+}
+
+/* ── Mobile backdrop ─────────────────────────────────────────────────────────── */
+.crm-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1039;
+  backdrop-filter: blur(1px);
+}
+
+/* ── Card overrides ──────────────────────────────────────────────────────────── */
+.card {
+  border-radius: 0.625rem !important;
+}
+
+/* ── Scrollbar (sidebar) — subtle webkit scrollbar ───────────────────────────── */
+.crm-sidebar nav::-webkit-scrollbar {
+  width: 4px;
+}
+.crm-sidebar nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.crm-sidebar nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+/* ── Skeleton shimmer ────────────────────────────────────────────────────────── */
+@keyframes crm-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e9ecef 25%,
+    #f1f3f5 50%,
+    #e9ecef 75%
+  );
+  background-size: 800px 100%;
+  animation: crm-shimmer 1.4s infinite linear;
+}
+
+/* ── Refresh spin animation ──────────────────────────────────────────────────── */
+@keyframes crm-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.crm-spin {
+  display: inline-block;
+  animation: crm-rotate 0.7s linear infinite;
+}
+
+/* ── Lead stage: NEGOTIATION (orange — not a standard Bootstrap colour) ─────── */
+.bg-orange {
+  background-color: #fd7e14 !important;
+  color: #fff !important;
+}
+
+/* ── Offcanvas backdrop (Bootstrap 5 class used by LeadDetails) ─────────────── */
+.offcanvas-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+/* ── Offcanvas drawer z-index ───────────────────────────────────────────────── */
+.offcanvas {
+  z-index: 1045;
+}
+
+/* ── Table: remove bottom border on last row ─────────────────────────────────── */
+.table > tbody > tr:last-child > td {
+  border-bottom: 0;
+}
+
+/* ── Project card hover effect ───────────────────────────────────────────────── */
+.crm-project-card {
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.crm-project-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px);
+}
+
+/* ── Clamped text (2 lines) ──────────────────────────────────────────────────── */
+.crm-line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,0 +1,16 @@
+"""
+HTTP status code constants used across the application.
+Mirrors the standard codes required by the SD.
+"""
+from http import HTTPStatus
+
+HTTP_200_OK = HTTPStatus.OK.value
+HTTP_201_CREATED = HTTPStatus.CREATED.value
+HTTP_204_NO_CONTENT = HTTPStatus.NO_CONTENT.value
+HTTP_400_BAD_REQUEST = HTTPStatus.BAD_REQUEST.value
+HTTP_401_UNAUTHORIZED = HTTPStatus.UNAUTHORIZED.value
+HTTP_403_FORBIDDEN = HTTPStatus.FORBIDDEN.value
+HTTP_404_NOT_FOUND = HTTPStatus.NOT_FOUND.value
+HTTP_409_CONFLICT = HTTPStatus.CONFLICT.value
+HTTP_422_UNPROCESSABLE_ENTITY = HTTPStatus.UNPROCESSABLE_ENTITY.value
+HTTP_500_INTERNAL_SERVER_ERROR = HTTPStatus.INTERNAL_SERVER_ERROR.value
