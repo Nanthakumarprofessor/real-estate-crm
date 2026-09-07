@@ -53,3 +53,8 @@ Thumbs.db
 # ── Logs ─────────────────────────────────────────────────────────────────────
 *.log
 logs/
+
+# ── Assignment brief / spec files (keep local only) ──────────────────────────
+real_estate.md
+real_estate_crm_SD.md
+Task for developers.docx
