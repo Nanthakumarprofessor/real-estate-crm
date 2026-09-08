@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: real-estate-crm-api
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: DATABASE_URL
+        sync: false          # set manually in Render dashboard
+      - key: JWT_SECRET_KEY
+        sync: false          # set manually in Render dashboard
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 60
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: ALLOWED_ORIGINS
+        sync: false          # set to your Vercel frontend URL in dashboard
+      - key: PYTHON_VERSION
+        value: 3.12.0

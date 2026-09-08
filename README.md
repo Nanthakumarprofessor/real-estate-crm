@@ -1,5 +1,10 @@
 # Real Estate CRM
 
+> **Live Demo**
+> - Frontend: *(add Vercel URL after deploy)*
+> - Backend API: *(add Render URL after deploy)*
+> - API Docs: *(Render URL)/docs*
+
 A production-minded Customer Relationship Management system built for a real estate sales team. The application manages the complete sales workflow from initial lead capture through property viewing, unit selection, and confirmed booking — with role-based access for Admin and Sales employees, a live dashboard, and full property inventory management across a Project → Building → Unit hierarchy.
 
 ---
@@ -228,7 +233,63 @@ task_project/
 
 ---
 
-## Setup Instructions
+## Deployment (Production)
+
+The app is deployed using three free services — **Neon** (PostgreSQL), **Render** (FastAPI backend), **Vercel** (React frontend).
+
+### Step 1 — Database on Neon
+
+1. Sign up at [neon.tech](https://neon.tech) → **New Project** → name it `real-estate-crm`
+2. Copy the connection string (looks like `postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require`)
+3. Change the scheme to `postgresql+psycopg://...` (required for psycopg3 driver)
+
+---
+
+### Step 2 — Backend on Render
+
+1. Sign up at [render.com](https://render.com) → **New → Web Service**
+2. Connect your GitHub repo → select the `real-estate-crm` repository
+3. Set **Root Directory** to `backend`
+4. Render auto-detects `render.yaml` — confirm these settings:
+   - **Build Command:** `./build.sh`
+   - **Start Command:** `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
+5. Under **Environment Variables**, add:
+
+   | Key | Value |
+   |---|---|
+   | `DATABASE_URL` | your Neon connection string (`postgresql+psycopg://...`) |
+   | `JWT_SECRET_KEY` | run `python -c "import secrets; print(secrets.token_hex(32))"` and paste result |
+   | `ALLOWED_ORIGINS` | `https://your-app.vercel.app` *(update after Vercel deploy)* |
+
+6. Click **Deploy** — Render will install deps, run Alembic migrations, seed demo data, and start the server
+7. Note your backend URL: `https://real-estate-crm-api.onrender.com`
+
+---
+
+### Step 3 — Frontend on Vercel
+
+1. Sign up at [vercel.com](https://vercel.com) → **New Project** → import your GitHub repo
+2. Set **Root Directory** to `frontend`
+3. Under **Environment Variables**, add:
+
+   | Key | Value |
+   |---|---|
+   | `VITE_API_BASE_URL` | `https://real-estate-crm-api.onrender.com/api` |
+
+4. Click **Deploy** — Vercel builds and publishes the React app
+5. Note your frontend URL: `https://your-app.vercel.app`
+
+6. Go back to Render → update the `ALLOWED_ORIGINS` env var to your Vercel URL → **Manual Deploy**
+
+---
+
+### After Deploy — Update README
+
+Update the Live Demo links at the top of this file with the real URLs.
+
+---
+
+## Setup Instructions (Local Development)
 
 ### Prerequisites
 - Python 3.12
