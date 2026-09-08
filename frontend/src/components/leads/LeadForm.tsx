@@ -143,7 +143,7 @@ export default function LeadForm({
             <button type="button" className="btn-close" onClick={onCancel} aria-label="Close" disabled={saving} />
           </div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form id="lead-form" onSubmit={handleSubmit} noValidate>
             <div className="modal-body">
               {apiError && (
                 <div className="alert alert-danger small py-2 d-flex align-items-center gap-2">
@@ -245,16 +245,16 @@ export default function LeadForm({
                 </div>
               )}
             </div>
-
-            <div className="modal-footer">
-              <button type="button" className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>Cancel</button>
-              <button type="submit" className="btn btn-primary" disabled={saving}>
-                {saving ? (
-                  <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Saving…</>
-                ) : mode === 'create' ? 'Create Lead' : 'Save Changes'}
-              </button>
-            </div>
           </form>
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>Cancel</button>
+            <button type="submit" form="lead-form" className="btn btn-primary" disabled={saving}>
+              {saving ? (
+                <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Saving…</>
+              ) : mode === 'create' ? 'Create Lead' : 'Save Changes'}
+            </button>
+            </div>
         </div>
       </div>
     </div>

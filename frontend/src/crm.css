@@ -268,3 +268,44 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ── Modal scroll fix — ensure every modal fits the viewport and scrolls ─────
+ *
+ * Bootstrap's modal-dialog-scrollable only works when the modal-content has
+ * a bounded height. Without an explicit max-height the modal grows taller
+ * than the viewport and the footer (Save/Cancel) disappears off-screen.
+ *
+ * This rule caps every .modal-dialog at 92vh so the modal-body scrolls
+ * internally while the header and footer always stay visible.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.modal-dialog {
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-dialog .modal-content {
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-dialog .modal-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;         /* critical — allows flex child to shrink below content size */
+}
+
+/* On very short screens (landscape mobile) allow a bit more room */
+@media (max-height: 500px) {
+  .modal-dialog,
+  .modal-dialog .modal-content {
+    max-height: 98vh;
+  }
+}
+
+/* Booking form lead list hover */
+[role="option"].hover-bg:hover {
+  background-color: var(--bs-primary-bg-subtle, #cfe2ff);
+}

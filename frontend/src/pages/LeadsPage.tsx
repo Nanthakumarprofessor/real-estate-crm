@@ -323,7 +323,7 @@ export default function LeadsPage() {
           aria-label="Confirm delete"
           style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
         >
-          <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: 400 }}>
+          <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable" style={{ maxWidth: 400 }}>
             <div className="modal-content border-0 shadow">
               <div className="modal-header border-0 pb-0">
                 <div className="d-flex align-items-center gap-2">

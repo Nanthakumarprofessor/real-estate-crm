@@ -79,7 +79,7 @@ export default function ProjectForm({ mode, project, onSuccess, onCancel }: Proj
             </h5>
             <button type="button" className="btn-close" onClick={onCancel} disabled={saving} aria-label="Close" />
           </div>
-          <form onSubmit={handleSubmit} noValidate>
+          <form id="project-form" onSubmit={handleSubmit} noValidate>
             <div className="modal-body">
               {apiError && (
                 <div className="alert alert-danger small py-2 d-flex align-items-center gap-2">
@@ -103,13 +103,14 @@ export default function ProjectForm({ mode, project, onSuccess, onCancel }: Proj
                   onChange={(e) => set('description', e.target.value)} disabled={saving} />
               </div>
             </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>Cancel</button>
-              <button type="submit" className="btn btn-primary" disabled={saving}>
-                {saving ? <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Saving…</> : mode === 'create' ? 'Create Project' : 'Save Changes'}
-              </button>
-            </div>
           </form>
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>Cancel</button>
+            <button type="submit" form="project-form" className="btn btn-primary" disabled={saving}>
+              {saving ? <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Saving…</> : mode === 'create' ? 'Create Project' : 'Save Changes'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -43,7 +43,9 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
   const [leads, setLeads]           = useState<Lead[]>([]);
   const [leadSearch, setLeadSearch] = useState('');
   const [leadsLoading, setLeadsLoading] = useState(false);
+  const [leadsError, setLeadsError] = useState('');
   const [selectedLeadId, setSelectedLeadId] = useState<number | ''>('');
+  const [leadListOpen, setLeadListOpen] = useState(false);
 
   // ── Project → Building → Unit cascade ─────────────────────────────────────
   const [projects, setProjects]           = useState<Project[]>([]);
@@ -66,13 +68,20 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
 
   // Load leads on mount — use size:200 to cover large pipelines for MVP.
   // Backend scopes by role: Sales users only receive their own assigned leads.
-  useEffect(() => {
+  const loadLeads = useCallback(() => {
     setLeadsLoading(true);
-    listLeads({ size: 200, is_active: true })
+    setLeadsError('');
+    listLeads({ size: 100, is_active: true })
       .then((res) => setLeads(res.items))
-      .catch(() => {/* non-critical — user sees empty dropdown */})
+      .catch((err) => {
+        setLeadsError(parseApiError(err));
+      })
       .finally(() => setLeadsLoading(false));
   }, []);
+
+  useEffect(() => {
+    loadLeads();
+  }, [loadLeads]);
 
   // Load projects on mount
   useEffect(() => {
@@ -184,7 +193,7 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
             <button type="button" className="btn-close" onClick={onCancel} disabled={saving} aria-label="Close" />
           </div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form id="booking-form" onSubmit={handleSubmit} noValidate>
             <div className="modal-body">
               {apiError && (
                 <div className="alert alert-danger small py-2 d-flex align-items-center gap-2 mb-3">
@@ -198,26 +207,100 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
                 <label htmlFor="bk-lead-search" className="form-label fw-medium">
                   Customer / Lead <span className="text-danger">*</span>
                 </label>
-                <input id="bk-lead-search" type="text" className="form-control form-control-sm mb-1"
-                  placeholder="Filter leads…" value={leadSearch}
-                  onChange={(e) => setLeadSearch(e.target.value)} disabled={saving} />
-                <select
-                  id="bk-lead"
-                  className={`form-select ${fieldErrors.lead ? 'is-invalid' : ''}`}
-                  value={selectedLeadId}
-                  onChange={(e) => { setSelectedLeadId(e.target.value ? Number(e.target.value) : ''); setFieldErrors((p) => ({...p, lead: undefined})); }}
-                  disabled={saving || leadsLoading}
-                  size={4}
-                  aria-label="Select lead"
-                >
-                  <option value="">— Select a lead —</option>
-                  {filteredLeads.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.name}{l.email ? ` (${l.email})` : ''}
-                    </option>
-                  ))}
-                </select>
-                {fieldErrors.lead && <div className="invalid-feedback d-block">{fieldErrors.lead}</div>}
+                {leadsError ? (
+                  <div className="alert alert-warning small py-2 d-flex align-items-center gap-2">
+                    <i className="bi bi-exclamation-triangle-fill flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-grow-1">Failed to load leads: {leadsError}</span>
+                    <button type="button" className="btn btn-sm btn-outline-warning py-0 px-2 flex-shrink-0"
+                      onClick={loadLeads} disabled={leadsLoading}>
+                      Retry
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Search input — opens the list on focus */}
+                    <input
+                      id="bk-lead-search"
+                      type="text"
+                      className="form-control form-control-sm mb-1"
+                      placeholder={selectedLeadId !== '' ? 'Change lead…' : 'Search leads…'}
+                      value={leadSearch}
+                      onChange={(e) => { setLeadSearch(e.target.value); setLeadListOpen(true); }}
+                      onFocus={() => setLeadListOpen(true)}
+                      onBlur={() => setLeadListOpen(false)}
+                      disabled={saving || leadsLoading}
+                      autoComplete="off"
+                    />
+                    {/* Selected lead badge — shown when list is closed */}
+                    {selectedLeadId !== '' && !leadListOpen && (() => {
+                      const picked = leads.find((l) => l.id === selectedLeadId);
+                      return picked ? (
+                        <div
+                          className="d-flex align-items-center gap-2 px-2 py-1 rounded bg-primary bg-opacity-10 border border-primary border-opacity-25 small"
+                          style={{ cursor: 'pointer' }}
+                          onClick={() => !saving && setLeadListOpen(true)}
+                        >
+                          <i className="bi bi-person-check-fill text-primary flex-shrink-0" aria-hidden="true" />
+                          <span className="flex-grow-1 fw-medium">{picked.name}{picked.email ? ` (${picked.email})` : ''}</span>
+                          <button
+                            type="button"
+                            className="btn-close"
+                            style={{ fontSize: '0.55rem' }}
+                            aria-label="Clear lead selection"
+                            onClick={(e) => { e.stopPropagation(); setSelectedLeadId(''); setLeadListOpen(false); setLeadSearch(''); setFieldErrors((p) => ({ ...p, lead: undefined })); }}
+                            disabled={saving}
+                          />
+                        </div>
+                      ) : null;
+                    })()}
+                    {/* Dropdown list — only when open */}
+                    {leadListOpen && (
+                      <div
+                        className={`border rounded overflow-auto ${fieldErrors.lead ? 'border-danger' : ''}`}
+                        style={{ maxHeight: 160 }}
+                        role="listbox"
+                        aria-label="Lead list"
+                      >
+                        {leadsLoading ? (
+                          <div className="px-3 py-2 text-muted small">Loading leads…</div>
+                        ) : filteredLeads.length === 0 ? (
+                          <div className="px-3 py-2 text-muted small">
+                            {leadSearch ? 'No leads match your search.' : 'No active leads found.'}
+                          </div>
+                        ) : (
+                          filteredLeads.map((l) => {
+                            const isSelected = selectedLeadId === l.id;
+                            return (
+                              <div
+                                key={l.id}
+                                id={`bk-lead-opt-${l.id}`}
+                                role="option"
+                                aria-selected={isSelected}
+                                className={`px-3 py-2 small d-flex align-items-center gap-2 ${isSelected ? 'bg-primary text-white' : 'hover-bg'}`}
+                                style={{ cursor: saving ? 'not-allowed' : 'pointer', userSelect: 'none' }}
+                                onMouseDown={(e) => e.preventDefault()} // prevent input blur before click registers
+                                onClick={() => {
+                                  if (saving) return;
+                                  setSelectedLeadId(l.id);
+                                  setLeadListOpen(false);
+                                  setLeadSearch('');
+                                  setFieldErrors((p) => ({ ...p, lead: undefined }));
+                                }}
+                              >
+                                {isSelected
+                                  ? <i className="bi bi-check2 flex-shrink-0" aria-hidden="true" />
+                                  : <i className="bi bi-person flex-shrink-0 text-muted" aria-hidden="true" />
+                                }
+                                <span>{l.name}{l.email ? ` (${l.email})` : ''}</span>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    )}
+                    {fieldErrors.lead && <div className="text-danger small mt-1">{fieldErrors.lead}</div>}
+                  </>
+                )}
               </div>
 
               {/* ── Project → Building → Unit cascade ───────────────────────── */}
@@ -306,16 +389,16 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
                 )}
               </div>
             </div>
-
-            <div className="modal-footer">
-              <button type="button" className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>Cancel</button>
-              <button type="submit" className="btn btn-primary" disabled={saving}>
-                {saving
-                  ? <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Booking…</>
-                  : <><i className="bi bi-calendar-check me-1" aria-hidden="true" />Create Booking</>}
-              </button>
-            </div>
           </form>
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-outline-secondary" onClick={onCancel} disabled={saving}>Cancel</button>
+            <button type="submit" form="booking-form" className="btn btn-primary" disabled={saving}>
+              {saving
+                ? <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />Booking…</>
+                : <><i className="bi bi-calendar-check me-1" aria-hidden="true" />Create Booking</>}
+            </button>
+          </div>
         </div>
       </div>
     </div>
