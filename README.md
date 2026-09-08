@@ -1,9 +1,9 @@
 # Real Estate CRM
 
 > **Live Demo**
-> - Frontend: *(add Vercel URL after deploy)*
-> - Backend API: *(add Render URL after deploy)*
-> - API Docs: *(Render URL)/docs*
+> - 🌐 Frontend: https://real-estate-crm-pearl-three.vercel.app
+> - ⚙️ Backend API: https://real-estate-crm-1-xsc9.onrender.com
+> - 📖 API Docs: https://real-estate-crm-1-xsc9.onrender.com/docs
 
 A production-minded Customer Relationship Management system built for a real estate sales team. The application manages the complete sales workflow from initial lead capture through property viewing, unit selection, and confirmed booking — with role-based access for Admin and Sales employees, a live dashboard, and full property inventory management across a Project → Building → Unit hierarchy.
 
